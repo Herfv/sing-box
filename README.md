@@ -6,6 +6,12 @@ The universal proxy platform.
 
 https://sing-box.sagernet.org
 
+For extended features
+
+- [Providers](./docs/configuration/provider/index.md)
+- [Load Balance](./docs/configuration/outbound/loadbalance.md)
+- [Muiltifile Configuration](./docs/configuration/index.md)
+
 ## License
 
 ```
