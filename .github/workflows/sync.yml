@@ -1,0 +1,19 @@
+name: Sync Fork
+
+on:
+  push:
+  schedule:
+    - cron: '36 7 * * *'
+
+jobs:
+  sync:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: tgymnich/fork-sync@v1.2.1
+        with:
+          github_token: ${{ secrets.SAC_TOKEN }}
+          owner: qjebbs
+          base: dev-next
+          head: dev-next
