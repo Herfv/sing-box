@@ -78,100 +78,161 @@ jobs:
             goos: windows
             goarch: amd64
             goamd64: v1
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: windows-amd64-v3
             goos: windows
             goarch: amd64
             goamd64: v3
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: windows-386
             goos: windows
             goarch: 386
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: windows-arm64
             goos: windows
             goarch: arm64
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: windows-arm32v7
             goos: windows
             goarch: arm
             goarm: 7
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           
           # linux
           - name: linux-amd64
             goos: linux
             goarch: amd64
             goamd64: v1
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-amd64-v3
             goos: linux
             goarch: amd64
             goamd64: v3
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-386
             goos: linux
             goarch: 386
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-arm64
             goos: linux
             goarch: arm64
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-armv5
             goos: linux
             goarch: arm
             goarm: 5
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-armv6
             goos: linux
             goarch: arm
             goarm: 6
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-armv7
             goos: linux
             goarch: arm
             goarm: 7
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-mips-softfloat
             goos: linux
             goarch: mips
             gomips: softfloat
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-mips-hardfloat
             goos: linux
             goarch: mips
             gomips: hardfloat
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-mipsel-softfloat
             goos: linux
             goarch: mipsle
             gomips: softfloat
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-mipsel-hardfloat
             goos: linux
             goarch: mipsle
             gomips: hardfloat
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-mips64
             goos: linux
             goarch: mips64
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-mips64el
             goos: linux
             goarch: mips64le
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: linux-s390x
             goos: linux
             goarch: s390x
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           # darwin
           - name: darwin-amd64
             goos: darwin
             goarch: amd64
             goamd64: v1
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: darwin-amd64-v3
             goos: darwin
             goarch: amd64
             goamd64: v3
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: darwin-arm64
             goos: darwin
             goarch: arm64
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           # freebsd
           - name: freebsd-amd64
             goos: freebsd
             goarch: amd64
             goamd64: v1
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: freebsd-amd64-v3
             goos: freebsd
             goarch: amd64
             goamd64: v3
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: freebsd-386
             goos: freebsd
             goarch: 386
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
           - name: freebsd-arm64
             goos: freebsd
             goarch: arm64
+            CGO_ENABLED: 0
+            TAGS: with_clash_api,with_quic
+            
+          # Android
+          - name: android-armv7
+            goos: android
+            goarch: arm
+            goarm: 7
+            CGO_ENABLED: 1
+            CC: /opt/hostedtoolcache/ndk/r21e/x64/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi24-clang
+            TAGS: with_clash_api,with_quic,with_lwip
 
       fail-fast: false
     runs-on: ubuntu-latest
@@ -181,8 +242,9 @@ jobs:
       GOAMD64: ${{ matrix.goamd64 }}
       GOARM: ${{ matrix.goarm }}
       GOMIPS: ${{ matrix.gomips }}
-      CGO_ENABLED: 0
-      TAGS: with_clash_api,with_quic
+      CGO_ENABLED: ${{ matrix.CGO_ENABLED }}
+      CC: ${{ matrix.CC }}
+      TAGS: ${{ matrix.TAGS }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -202,6 +264,14 @@ jobs:
           path: |
             ~/go/pkg/mod
           key: go-${{ hashFiles('**/go.sum') }}
+      - name: Setup Android NDK
+        if: |
+          matrix.goos == 'android' && matrix.goarch == 'arm' && matrix.goarm == '7'
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r21e
+          add-to-path: false
       - name: Build
         id: build
         run: make
